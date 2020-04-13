@@ -127,3 +127,29 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# OCP4 assets
+assets*
+openshift-install
+env.sh
+client/oc
+client/kubectl
+client/README.md
+oc.tar.gz
+istioctl
+users.htpasswd
+install-config.yaml
+install-config.bak.yaml
+
+# registry-puller
+registry-puller
+
+# istio-operator
+istio-operator
+olm/operator_source.yaml
+
+######## IDEs
+
+### VisualStudioCode ###
+.vscode
+.history
