@@ -10,12 +10,12 @@ stringData:
 apiVersion: operators.coreos.com/v1
 kind: OperatorSource
 metadata:
-  name: quay-maistraqe
+  name: quay-maistra
   namespace: openshift-marketplace
 spec:
   type: appregistry
   endpoint: https://quay.io/cnr
-  registryNamespace: maistraqe
+  registryNamespace: maistra
   displayName: "Maistra Operators"
   publisher: "Maistra Team"
   authorizationToken:

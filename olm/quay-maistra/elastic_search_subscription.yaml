@@ -4,8 +4,8 @@ metadata:
   name: elasticsearch-operator
   namespace: openshift-operators
 spec:
-  channel: "4.2"
+  channel: "4.3"
   installPlanApproval: Automatic
   name: elasticsearch-operator
-  source: redhat-operators
+  source: quay-maistra
   sourceNamespace: openshift-marketplace

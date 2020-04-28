@@ -25,7 +25,7 @@ import shutil
 class Operator(object):
     """ An instance of this class installs operators from OLM openshift-marketplace."""
 
-    def __init__(self, maistra_branch="maistra-1.1", maistra_tag="latest-1.1-qe", release="1.1"):
+    def __init__(self, maistra_branch="maistra-1.1", maistra_tag="latest-1.1-qe", release="stable"):
         self.es_sub_channel = "4.2"
         self.jaeger_sub_channel = "stable"
         self.kiali_sub_channel = "stable"

@@ -7,5 +7,5 @@ spec:
   channel: "stable"
   installPlanApproval: Automatic
   name: jaeger-product
-  source: quay-maistraqe
+  source: quay-maistra
   sourceNamespace: openshift-marketplace
