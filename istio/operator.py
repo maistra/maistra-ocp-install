@@ -25,7 +25,7 @@ import shutil
 class Operator(object):
     """ An instance of this class installs operators from OLM openshift-marketplace."""
 
-    def __init__(self, maistra_branch="maistra-1.1", maistra_tag="latest-1.1-qe", release="stable"):
+    def __init__(self, maistra_branch="maistra-1.1", maistra_tag="v1.1", release="stable"):
         self.es_sub_channel = "4.2"
         self.jaeger_sub_channel = "stable"
         self.kiali_sub_channel = "stable"
@@ -38,12 +38,12 @@ class Operator(object):
     # def updateTemplate(self):
 
     def mutate(self, cr_file="cr_mt_quay.yaml"):
-        image = re.compile('tag: .*')
+        image = re.compile('version: .*')
         with open(cr_file, 'r') as f:
             lines = f.readlines()
         with open(cr_file, 'w') as f:
             for line in lines:
-                f.write(image.sub("tag: {:s}".format(self.maistra_tag), line))
+                f.write(image.sub("version: {:s}".format(self.maistra_tag), line))
 
 
     def checkRunning(self):
