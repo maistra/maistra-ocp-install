@@ -34,7 +34,6 @@ class Moitt(object):
         self.component = None
         self.assets = None
         self.version = None
-        self.tag = None
         self.quay = False
         self.release = None
         
@@ -55,7 +54,6 @@ class Moitt(object):
         parser.add_argument('-c', '--component', type=str, choices=['ocp', 'registry-puller', 'istio'], help='Specify Component from ocp, registry-puller, istio')
         parser.add_argument('-d', '--directory', type=str, default='assets', help='OCP cluster config assets directory path')
         parser.add_argument('-v', '--version', type=str, default='4.3.9', help='OCP installer version')
-        parser.add_argument('-t', '--tag', type=str, default='v1.1', help='Istio Operator and SMCP image tag')
         parser.add_argument('-q', '--quay', help='install istio operator from quay.io', action='store_true')
         parser.add_argument('-r', '--release', type=str, default='stable', help='OLM release channel')
         args = parser.parse_args()
@@ -64,7 +62,6 @@ class Moitt(object):
         self.component = args.component
         self.assets = args.directory
         self.version = args.version
-        self.tag = args.tag
         self.quay = args.quay
         self.release = args.release
       
@@ -113,8 +110,7 @@ def main():
         ocp.logout()
     
     if moitt.component == 'istio':
-        operator = Operator(maistra_branch="maistra-"+moitt.release, maistra_tag=moitt.tag, release=moitt.release)
-        operator.mutate(cr_file=moitt.crfile)
+        operator = Operator(maistra_branch="maistra-"+moitt.release, release=moitt.release)
 
         nslist = ['bookinfo', 'foo', 'bar', 'legacy']
         smmr = os.getcwd() + '/testdata/member-roll.yaml'
@@ -131,7 +127,7 @@ def main():
                 operator.update_quay_token()
                 operator.apply_operator_source()
 
-            operator.deploy_es()
+            #operator.deploy_es()
             operator.deploy_jaeger()
             operator.deploy_kiali()
             operator.deploy_istio()

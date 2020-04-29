@@ -25,25 +25,14 @@ import shutil
 class Operator(object):
     """ An instance of this class installs operators from OLM openshift-marketplace."""
 
-    def __init__(self, maistra_branch="maistra-1.1", maistra_tag="v1.1", release="stable"):
+    def __init__(self, maistra_branch="maistra-1.1", release="stable"):
         self.es_sub_channel = "4.2"
         self.jaeger_sub_channel = "stable"
         self.kiali_sub_channel = "stable"
         self.ossm_sub_channel = "stable"
         self.namespace = "openshift-operators"
         self.maistra_branch = maistra_branch
-        self.maistra_tag = maistra_tag
         self.release = release
-
-    # def updateTemplate(self):
-
-    def mutate(self, cr_file="cr_mt_quay.yaml"):
-        image = re.compile('version: .*')
-        with open(cr_file, 'r') as f:
-            lines = f.readlines()
-        with open(cr_file, 'w') as f:
-            for line in lines:
-                f.write(image.sub("version: {:s}".format(self.maistra_tag), line))
 
 
     def checkRunning(self):
@@ -100,6 +89,7 @@ class Operator(object):
 
     def deploy_istio(self):
         sp.run(['oc', 'apply', '-f', 'olm/{:s}/ossm_subscription.yaml'.format(self.release)])
+        sp.run(['sleep', '20'])
 
     # TBD patch41 is a temporary patch method for OCP 4.1
     def patch41(self):
@@ -121,7 +111,7 @@ class Operator(object):
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/ossm_subscription.yaml'.format(self.release)])
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/kiali_subscription.yaml'.format(self.release)])
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/jaeger_subscription.yaml'.format(self.release)])
-        sp.run(['oc', 'delete', '-f', 'olm/{:s}/elastic_search_subscription.yaml'.format(self.release)])
+        #sp.run(['oc', 'delete', '-f', 'olm/{:s}/elastic_search_subscription.yaml'.format(self.release)])
         sp.run(['sleep', '10'])
 
         # delete all CSV
