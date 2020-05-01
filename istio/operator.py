@@ -91,20 +91,6 @@ class Operator(object):
         sp.run(['oc', 'apply', '-f', 'olm/{:s}/ossm_subscription.yaml'.format(self.release)])
         sp.run(['sleep', '20'])
 
-    # TBD patch41 is a temporary patch method for OCP 4.1
-    def patch41(self):
-        proc = sp.run(['oc', 'get', 'clusterversion'], stdout=sp.PIPE, universal_newlines=True)
-        if "4.1" in proc.stdout:
-            sp.run(['oc', 'patch', 'csc/quay-maistraqe', '-n', 'openshift-marketplace', '--type', 'merge',
-             '-p', r'{"spec":{"targetNamespace": "openshift-operators"}}'])
-            sp.run(['oc', 'patch', 'subscription/elasticsearch-operator', '-n', self.namespace, '--type', 'merge',
-             '-p', r'{"spec":{"sourceNamespace": "openshift-operators"}}'])
-            sp.run(['oc', 'patch', 'subscription/jaeger-product', '-n', self.namespace, '--type', 'merge',
-             '-p', r'{"spec":{"sourceNamespace": "openshift-operators"}}'])
-            sp.run(['oc', 'patch', 'subscription/kiali-ossm', '-n', self.namespace, '--type', 'merge',
-             '-p', r'{"spec":{"sourceNamespace": "openshift-operators"}}'])
-            sp.run(['oc', 'patch', 'subscription/servicemeshoperator', '-n', self.namespace, '--type', 'merge',
-             '-p', r'{"spec":{"sourceNamespace": "openshift-operators"}}'])
 
     def uninstall(self):
         # delete subscription
