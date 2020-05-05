@@ -47,7 +47,6 @@ $ source .env/bin/activate
 * Export the environment variables (See the table above) with their values.
 
 ### 3. OCP/AWS
-* Go to directory "`install`".
 * Run "`python main.py -h`" and follow arguments help message. e.g. "`python main.py -i -c ocp -d ./assets -v 4.3.9`" will install an OCP 4.3.9 cluster on AWS.
 * After `Deploying the cluster...` starts, follow the prompts.
   * Select a SSH public key
@@ -62,12 +61,10 @@ $ source .env/bin/activate
 
 ### 4. (Optional) [registry-puller](https://github.com/knrc/registry-puller)
 * If you need to pull images from a private registry, install this registry-puller tool on an OCP cluster first.
-* Go to directory "`install`"
 * Run "`python main.py -h`" and follow arguments help message. e.g. "`python main.py -i -c registry-puller -d ./assets`" will deploy the registry-puller pod in registry-puller namespace.
 
 ### 5. Maistra/Istio
-* Go to directory "`install`"
-* Run "`python main -h`" and follow arguments help message. e.g. "`python main.py -i -c istio -d ./assets`" will install the Elastic Search, Jaeger, Kiali, Istio Operators from OpenShift OLM OperatorHub. After operators are running, a service mesh control plane and a memeber roll will be created.
+* Run "`python main -h`" and follow arguments help message. e.g. "`python main.py -i -c istio -d ./assets`" will install the Jaeger, Kiali, Service Mesh Operators from OpenShift OLM OperatorHub. After operators are running, a service mesh control plane and a memeber roll will be created.
 * Waiting for the service mesh control plane installation completes. It usually takes 10 - 15 minutes.
 
     When service mesh control plane installation completed, you should see message "Installed=True, reason=InstallSuccessful"
