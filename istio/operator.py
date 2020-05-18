@@ -89,7 +89,7 @@ class Operator(object):
 
     def deploy_istio(self):
         sp.run(['oc', 'apply', '-f', 'olm/{:s}/ossm_subscription.yaml'.format(self.release)])
-        sp.run(['sleep', '20'])
+        sp.run(['sleep', '50'])
 
 
     def uninstall(self):
