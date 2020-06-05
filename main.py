@@ -123,12 +123,16 @@ def main():
                 pw = f.read() 
             ocp.login('kubeadmin', pw)
 
+            operator.deploy_es()
+            operator.deploy_jaeger()
+
             if moitt.quay:
                 operator.update_quay_token()
-                operator.apply_operator_source()
+                #operator.apply_operator_source()
+                operator.apply_catalog_source()
 
             #operator.deploy_es()
-            operator.deploy_jaeger()
+            #operator.deploy_jaeger()
             operator.deploy_kiali()
             operator.deploy_istio()
 
@@ -159,7 +163,8 @@ def main():
             operator.uninstall()
 
             if moitt.quay:
-                operator.uninstall_operator_source()
+                #operator.uninstall_operator_source()
+                operator.uninstall_catalog_source()
 
             ocp.logout()
 

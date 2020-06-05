@@ -4,8 +4,8 @@ metadata:
   name: jaeger-product
   namespace: openshift-operators
 spec:
-  channel: "stable"
+  channel: stable
   installPlanApproval: Automatic
   name: jaeger-product
-  source: quay-maistra
+  source: redhat-operators
   sourceNamespace: openshift-marketplace

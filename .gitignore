@@ -146,7 +146,7 @@ registry-puller
 
 # istio-operator
 istio-operator
-olm/operator_source.yaml
+olm/pull_secret.yaml
 
 ######## IDEs
 

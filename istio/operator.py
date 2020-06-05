@@ -68,14 +68,23 @@ class Operator(object):
         print(proc.stdout)
 
     def update_quay_token(self):
-        with open('olm/template/operator_source_template.yaml', 'r') as f:
+        with open('olm/template/pull_secret_template.yaml', 'r') as f:
             lines = f.readlines()
-        with open('olm/operator_source.yaml', 'w') as f:
+        with open('olm/pull_secret.yaml', 'w') as f:
             for line in lines:
                 f.write(line.replace("[quay_token]", os.environ['QUAY_TOKEN']))
 
+    def apply_catalog_source(self):
+        sp.run(['oc', 'apply', '-f', 'olm/pull_secret.yaml'])
+        sp.run(['sleep', '5'])
+        sp.run(['oc', 'secrets', 'link', '--for=pull', 'default', 'quay-operators-secret', '-n', 'openshift-marketplace'])
+        sp.run(['oc', 'apply', '-f', 'olm/{:s}/catalog_source.yaml'.format(self.release)])
+        sp.run(['sleep', '30'])
+
     def apply_operator_source(self):
-        sp.run(['oc', 'apply', '-f', 'olm/operator_source.yaml'])
+        sp.run(['oc', 'apply', '-f', 'olm/pull_secret.yaml'])
+        sp.run(['sleep', '5'])
+        sp.run(['oc', 'apply', '-f', 'olm/{:s}/operator_source.yaml'.format(self.release)])
         sp.run(['sleep', '30'])
 
     def deploy_es(self):
@@ -89,7 +98,7 @@ class Operator(object):
 
     def deploy_istio(self):
         sp.run(['oc', 'apply', '-f', 'olm/{:s}/ossm_subscription.yaml'.format(self.release)])
-        sp.run(['sleep', '50'])
+        sp.run(['sleep', '180'])
 
 
     def uninstall(self):
@@ -97,15 +106,18 @@ class Operator(object):
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/ossm_subscription.yaml'.format(self.release)])
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/kiali_subscription.yaml'.format(self.release)])
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/jaeger_subscription.yaml'.format(self.release)])
-        #sp.run(['oc', 'delete', '-f', 'olm/{:s}/elastic_search_subscription.yaml'.format(self.release)])
+        sp.run(['oc', 'delete', '-f', 'olm/{:s}/elastic_search_subscription.yaml'.format(self.release)])
         sp.run(['sleep', '10'])
 
         # delete all CSV
         sp.run(['oc', 'delete', 'csv', '-n', self.namespace, '--all'])
         sp.run(['sleep', '30'])
 
+    def uninstall_catalog_source(self):
+        sp.run(['oc', 'delete', '-f', 'olm/{:s}/catalog_source.yaml'.format(self.release)])
+
     def uninstall_operator_source(self):
-        sp.run(['oc', 'delete', '-f', 'olm/operator_source.yaml'])
+        sp.run(['oc', 'delete', '-f', 'olm/{:s}/operator_source.yaml'.format(self.release)])
 
 
 class ControlPlane(object):
