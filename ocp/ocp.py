@@ -55,7 +55,7 @@ class OCP(object):
 
         # download the installer
         print('Downloading the installer...')
-        r = requests.get(self.installer_url, stream=True)
+        r = requests.get(self.installer_url, stream=True, verify=False)
         chunkSize = 1024
         fileSize = int(r.headers['Content-length'])
         wrote = 0
@@ -83,7 +83,7 @@ class OCP(object):
         os.environ['KUBECONFIG'] = self.assets + '/auth/kubeconfig'
 
         print('Downloading the oc client...')
-        r = requests.get(self.oc_url, stream=True)
+        r = requests.get(self.oc_url, stream=True, verify=False)
         chunkSize = 1024
         fileSize = int(r.headers['Content-length'])
         wrote = 0
@@ -135,7 +135,7 @@ class OCP(object):
 
         # download the installer
         print('Downloading the installer...')
-        r = requests.get(self.installer_url, stream=True)
+        r = requests.get(self.installer_url, stream=True, verify=False)
         chunkSize = 1024
         fileSize = int(r.headers['Content-length'])
         wrote = 0

@@ -7,5 +7,5 @@ spec:
   channel: stable
   installPlanApproval: Automatic
   name: servicemeshoperator
-  source: quay-maistra
+  source: maistra-manifests
   sourceNamespace: openshift-marketplace

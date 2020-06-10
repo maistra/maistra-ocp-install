@@ -1,8 +1,8 @@
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
 metadata:
-  name: quay-maistra
+  name: maistra-manifests
   namespace: openshift-marketplace
 spec:
   sourceType: grpc
-  image: "quay.io/maistra/olm-catalog-source:1.1.2.2"
+  image: "quay.io/maistra/servicemesh-olm-cs:1.1.2.3"

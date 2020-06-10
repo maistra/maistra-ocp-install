@@ -78,7 +78,8 @@ class Operator(object):
         sp.run(['oc', 'apply', '-f', 'olm/pull_secret.yaml'])
         sp.run(['sleep', '5'])
         sp.run(['oc', 'secrets', 'link', '--for=pull', 'default', 'quay-operators-secret', '-n', 'openshift-marketplace'])
-        sp.run(['oc', 'apply', '-f', 'olm/{:s}/catalog_source.yaml'.format(self.release)])
+        sp.run(['oc', 'apply', '-f', 'olm/{:s}/maistra_catalog_source.yaml'.format(self.release)])
+        sp.run(['oc', 'apply', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
         sp.run(['sleep', '30'])
 
     def apply_operator_source(self):
@@ -114,7 +115,8 @@ class Operator(object):
         sp.run(['sleep', '30'])
 
     def uninstall_catalog_source(self):
-        sp.run(['oc', 'delete', '-f', 'olm/{:s}/catalog_source.yaml'.format(self.release)])
+        sp.run(['oc', 'delete', '-f', 'olm/{:s}/maistra_catalog_source.yaml'.format(self.release)])
+        sp.run(['oc', 'delete', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
 
     def uninstall_operator_source(self):
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/operator_source.yaml'.format(self.release)])
