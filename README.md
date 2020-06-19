@@ -1,8 +1,8 @@
 # maistra-ocp-install
 
-[![](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat)](https://github.com/Maistra/maistra-ocp-install/blob/master/LICENSE)
+[![](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat)](https://github.com/maistra/maistra-ocp-install/blob/development/LICENSE)
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg?style=flat)](https://www.python.org/downloads/release/python-370/)
-![](https://img.shields.io/github/repo-size/Maistra/maistra-ocp-install.svg?style=flat)
+![](https://img.shields.io/github/repo-size/maistra/maistra-ocp-install.svg?style=flat)
 
 An installation tool for running operators and Maistra on AWS OpenShift 4.x cluster.
 
@@ -10,7 +10,7 @@ An installation tool for running operators and Maistra on AWS OpenShift 4.x clus
 
 This project aims to automate installation/uninstallation Maistra system on an AWS OpenShift 4.x Cluster.
 
-The installation/uninstallation follows [OpenShift Installer](https://github.com/openshift/installer) and [istio-operator](https://github.com/Maistra/istio-operator).
+The installation/uninstallation follows [OpenShift Installer](https://github.com/openshift/installer) and [istio-operator](https://github.com/maistra/istio-operator).
 
 ## Versions
 
@@ -72,8 +72,8 @@ $ source .env/bin/activate
 
 ## Uninstallation
 
-* Follow the [Installation](https://github.com/Maistra/maistra-ocp-install#installation) section and replace argument `-i` with `-u` for each component.
+* Follow the [Installation](https://github.com/maistra/maistra-ocp-install#installation) section and replace argument `-i` with `-u` for each component.
 
 ## License
 
-[Maistra maistra-ocp-install](https://github.com/Maistra/maistra-ocp-install) is [Apache 2.0 licensed](https://github.com/Maistra/maistra-ocp-install/blob/master/LICENSE)
+[Maistra maistra-ocp-install](https://github.com/maistra/maistra-ocp-install) is [Apache 2.0 licensed](https://github.com/maistra/maistra-ocp-install/blob/development/LICENSE)
