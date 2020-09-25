@@ -124,6 +124,11 @@ class OCP(object):
         print(proc.stdout)
         print(proc.stderr)
 
+    def login_bot(self):
+        proc = sp.run(['oc', 'login', '-u', os.environ['CLUSTER_ADMIN'], '-p', os.environ['ADMIN_PASS'], '--server=', os.environ['CLUSTER_SERVER'], '--insecure-skip-tls-verify=true'], stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
+        print(proc.stdout)
+        print(proc.stderr)
+
     def logout(self):
         proc = sp.run(['oc', 'logout'], stdout=sp.PIPE, universal_newlines=True)
         print(proc.stdout)

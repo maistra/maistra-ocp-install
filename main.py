@@ -88,7 +88,8 @@ def main():
             with open(moitt.assets + '/auth/kubeadmin-password') as f:
                 pw = f.read()
             ocp.login('kubeadmin', pw)
-            
+            ##ocp.login_bot()
+
             # Create testing users, qe1 and qe2
             ocp.create_users()
             ocp.logout()
@@ -103,6 +104,8 @@ def main():
         with open(moitt.assets + '/auth/kubeadmin-password') as f:
             pw = f.read() 
         ocp.login('kubeadmin', pw)
+        ##ocp.login_bot()
+
         if moitt.install:
             puller.build()
             puller.execute()
@@ -122,6 +125,7 @@ def main():
             with open(moitt.assets + '/auth/kubeadmin-password') as f:
                 pw = f.read() 
             ocp.login('kubeadmin', pw)
+            ##ocp.login_bot()
 
             operator.deploy_es()
             operator.deploy_jaeger()
@@ -141,6 +145,8 @@ def main():
 
             # deploy controlplane
             ocp.login('qe1', os.getenv('QE1_PWD', 'qe1pw'))
+            ##ocp.login_bot()
+
             cp.install(cr_file=moitt.crfile)
             cp.create_ns(cp.nslist)
             cp.apply_smmr()
@@ -151,6 +157,8 @@ def main():
         elif moitt.uninstall:
             # uninstall controlplane
             ocp.login('qe1', os.getenv('QE1_PWD', 'qe1pw'))
+            ##ocp.login_bot()
+
             cp.uninstall(cr_file=moitt.crfile)
             ocp.logout()
 
@@ -160,6 +168,8 @@ def main():
             with open(moitt.assets + '/auth/kubeadmin-password') as f:
                 pw = f.read() 
             ocp.login('kubeadmin', pw)
+            ##ocp.login_bot()
+
             operator.uninstall()
 
             if moitt.quay:

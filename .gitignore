@@ -131,7 +131,7 @@ dmypy.json
 # OCP4 assets
 assets*
 openshift-install
-env.sh
+env*.sh
 client/oc
 client/kubectl
 client/README.md
