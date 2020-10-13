@@ -75,11 +75,19 @@ class Operator(object):
                 f.write(line.replace("[quay_token]", os.environ['QUAY_TOKEN']))
 
     def apply_catalog_source(self):
+        if self.release.startswith("iib"):
+            print("Add icsp and pull secret")
+            sp.run(['oc', 'set', 'data', 'secret/pull-secret', '-n', 'openshift-config', '--from-file=.dockerconfigjson={:s}'.format('olm/authfile')])
+            sp.run(['oc', 'apply', '-f', 'olm/icsp.yaml'])
+            sp.run(['sleep', '20'])
+
         sp.run(['oc', 'apply', '-f', 'olm/pull_secret.yaml'])
         sp.run(['sleep', '5'])
         sp.run(['oc', 'secrets', 'link', '--for=pull', 'default', 'quay-operators-secret', '-n', 'openshift-marketplace'])
         sp.run(['oc', 'apply', '-f', 'olm/{:s}/maistra_catalog_source.yaml'.format(self.release)])
-        sp.run(['oc', 'apply', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
+        if self.release == "maistra-2.0":
+            sp.run(['oc', 'apply', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
+
         sp.run(['sleep', '30'])
 
     def apply_operator_source(self):
@@ -107,7 +115,7 @@ class Operator(object):
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/ossm_subscription.yaml'.format(self.release)])
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/kiali_subscription.yaml'.format(self.release)])
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/jaeger_subscription.yaml'.format(self.release)])
-        sp.run(['oc', 'delete', '-f', 'olm/{:s}/elastic_search_subscription.yaml'.format(self.release)])
+        ##sp.run(['oc', 'delete', '-f', 'olm/{:s}/elastic_search_subscription.yaml'.format(self.release)])
         sp.run(['sleep', '10'])
 
         # delete all CSV
@@ -116,7 +124,8 @@ class Operator(object):
 
     def uninstall_catalog_source(self):
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/maistra_catalog_source.yaml'.format(self.release)])
-        sp.run(['oc', 'delete', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
+        if self.release == "maistra-2.0":
+            sp.run(['oc', 'delete', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
 
     def uninstall_operator_source(self):
         sp.run(['oc', 'delete', '-f', 'olm/{:s}/operator_source.yaml'.format(self.release)])

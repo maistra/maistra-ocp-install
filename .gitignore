@@ -147,6 +147,7 @@ registry-puller
 # istio-operator
 istio-operator
 olm/pull_secret.yaml
+olm/authfile
 
 ######## IDEs
 
