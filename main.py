@@ -56,6 +56,7 @@ class Moitt(object):
         parser.add_argument('-v', '--version', type=str, default='4.3.9', help='OCP installer version')
         parser.add_argument('-q', '--quay', help='install istio operator from quay.io', action='store_true')
         parser.add_argument('-r', '--release', type=str, default='stable', help='OLM release channel')
+        parser.add_argument('-b', '--bot', help='login cluster created by cluster-bot', action='store_true')
         args = parser.parse_args()
         self.install = args.install
         self.uninstall = args.uninstall
@@ -64,6 +65,7 @@ class Moitt(object):
         self.version = args.version
         self.quay = args.quay
         self.release = args.release
+        self.bot = args.bot
       
 
 def main():
@@ -100,11 +102,13 @@ def main():
     if moitt.component == 'registry-puller':
         puller = Puller(secret_file=moitt.pullsec)
 
-        # Read kubeadmin password
-        with open(moitt.assets + '/auth/kubeadmin-password') as f:
-            pw = f.read() 
-        ocp.login('kubeadmin', pw)
-        ##ocp.login_bot()
+        if moitt.bot:
+            ocp.login_bot()
+        else:
+            # Read kubeadmin password
+            with open(moitt.assets + '/auth/kubeadmin-password') as f:
+                pw = f.read()
+            ocp.login('kubeadmin', pw)
 
         if moitt.install:
             puller.build()
@@ -121,11 +125,13 @@ def main():
         cp = ControlPlane("basic-install", "istio-system", "bookinfo", nslist, smmr, sample)
         if moitt.install:
             # deploy operators
-            # Read kubeadmin password
-            with open(moitt.assets + '/auth/kubeadmin-password') as f:
-                pw = f.read() 
-            ocp.login('kubeadmin', pw)
-            ##ocp.login_bot()
+            if moitt.bot:
+                ocp.login_bot()
+            else:
+                # Read kubeadmin password
+                with open(moitt.assets + '/auth/kubeadmin-password') as f:
+                    pw = f.read()
+                ocp.login('kubeadmin', pw)
 
             if moitt.quay:
                 operator.update_quay_token()
@@ -140,8 +146,10 @@ def main():
             ocp.logout()
 
             # deploy controlplane
-            ocp.login('qe1', os.getenv('QE1_PWD', 'qe1pw'))
-            ##ocp.login_bot()
+            if moitt.bot:
+                ocp.login_bot()
+            else:
+                ocp.login('qe1', os.getenv('QE1_PWD', 'qe1pw'))
 
             cp.install(cr_file=moitt.crfile)
             cp.create_ns(cp.nslist)
@@ -152,19 +160,22 @@ def main():
 
         elif moitt.uninstall:
             # uninstall controlplane
-            ocp.login('qe1', os.getenv('QE1_PWD', 'qe1pw'))
-            ##ocp.login_bot()
+            if moitt.bot:
+                ocp.login_bot()
+            else:
+                ocp.login('qe1', os.getenv('QE1_PWD', 'qe1pw'))
 
             cp.uninstall(cr_file=moitt.crfile)
             ocp.logout()
 
             # uninstall operators
-            # Read kubeadmin password
-
-            with open(moitt.assets + '/auth/kubeadmin-password') as f:
-                pw = f.read() 
-            ocp.login('kubeadmin', pw)
-            ##ocp.login_bot()
+            if moitt.bot:
+                ocp.login_bot()
+            else:
+                # Read kubeadmin password
+                with open(moitt.assets + '/auth/kubeadmin-password') as f:
+                    pw = f.read()
+                ocp.login('kubeadmin', pw)
 
             operator.uninstall()
 

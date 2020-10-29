@@ -79,16 +79,18 @@ class Operator(object):
             print("Add icsp and pull secret")
             sp.run(['oc', 'set', 'data', 'secret/pull-secret', '-n', 'openshift-config', '--from-file=.dockerconfigjson={:s}'.format('olm/authfile')])
             sp.run(['oc', 'apply', '-f', 'olm/icsp.yaml'])
-            sp.run(['sleep', '20'])
+            sp.run(['sleep', '120'])
 
+        sp.run(['oc', 'project', 'openshift-marketplace'])
         sp.run(['oc', 'apply', '-f', 'olm/pull_secret.yaml'])
-        sp.run(['sleep', '5'])
         sp.run(['oc', 'secrets', 'link', '--for=pull', 'default', 'quay-operators-secret', '-n', 'openshift-marketplace'])
+        sp.run(['sleep', '30'])
         sp.run(['oc', 'apply', '-f', 'olm/{:s}/maistra_catalog_source.yaml'.format(self.release)])
+        ##sp.run(['oc', 'apply', '-f', 'olm/{:s}/jaeger_catalog_source.yaml'.format(self.release)])
         if self.release == "maistra-2.0":
             sp.run(['oc', 'apply', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
 
-        sp.run(['sleep', '30'])
+        sp.run(['sleep', '180'])
 
     def apply_operator_source(self):
         sp.run(['oc', 'apply', '-f', 'olm/pull_secret.yaml'])
