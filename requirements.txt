@@ -8,5 +8,5 @@ awscli==1.16.304
 jwcrypto==0.7
 pycparser==2.19
 cffi==1.14.0
-cryptography==2.8
+cryptography==3.2
 six==1.13.0
