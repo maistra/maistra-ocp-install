@@ -1,8 +1,0 @@
-apiVersion: operators.coreos.com/v1alpha1
-kind: CatalogSource
-metadata:
-  name: kiali-manifests
-  namespace: openshift-marketplace
-spec:
-  sourceType: grpc
-  image: "brew.registry.redhat.io/rh-osbs/iib:19769"
