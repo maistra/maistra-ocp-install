@@ -3,14 +3,6 @@
 QUAY_TOKEN_SECRET_FILE=""
 QUAY_TOKEN=""
 
-function install_registry_puller() {
-    git clone https://github.com/knrc/registry-puller.git
-    oc new-project registry-puller
-    oc create configmap -n registry-puller registry-secret --from-file=${QUAY_TOKEN_SECRET_FILE}
-    oc create -f registry-puller/registry-puller-4.0.yaml
-    sleep 30
-}
-
 function deploy_jaeger() {
     oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
@@ -106,7 +98,7 @@ function create_smcp() {
 apiVersion: maistra.io/v1
 kind: ServiceMeshControlPlane
 metadata:
-  name: basic-install
+  name: basic
   namespace: istio-system
 spec:
   version: v2.0
@@ -141,7 +133,6 @@ EOF
 }
 
 function main() {
-    install_registry_puller
     deploy_jaeger
     deploy_catalog_source
     deploy_ossm_operator

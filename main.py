@@ -19,7 +19,6 @@ import os
 import argparse
 
 from ocp.ocp import OCP
-from puller import Puller
 from istio.operator import Operator, ControlPlane
 
 
@@ -40,8 +39,6 @@ class Moitt(object):
     def envParse(self):
         if 'AWS_PROFILE' in os.environ:
             self.profile = os.environ['AWS_PROFILE']
-        if 'PULL_SEC' in os.environ:
-            self.pullsec = os.environ['PULL_SEC']
         if 'CR_FILE' in os.environ:
             self.crfile = os.environ['CR_FILE']
 
@@ -51,9 +48,9 @@ class Moitt(object):
         group = parser.add_mutually_exclusive_group(required=True)
         group.add_argument('-i', '--install', help='install operation', action='store_true')
         group.add_argument('-u', '--uninstall', help='uninstall operation', action='store_true')
-        parser.add_argument('-c', '--component', type=str, choices=['ocp', 'registry-puller', 'istio'], help='Specify Component from ocp, registry-puller, istio')
+        parser.add_argument('-c', '--component', type=str, choices=['ocp', 'istio'], help='Specify Component from ocp, istio')
         parser.add_argument('-d', '--directory', type=str, default='assets', help='OCP cluster config assets directory path')
-        parser.add_argument('-v', '--version', type=str, default='4.3.9', help='OCP installer version')
+        parser.add_argument('-v', '--version', type=str, default='4.6.17', help='OCP installer version')
         parser.add_argument('-q', '--quay', help='install istio operator from quay.io', action='store_true')
         parser.add_argument('-r', '--release', type=str, default='stable', help='OLM release channel')
         parser.add_argument('-b', '--bot', help='login cluster created by cluster-bot', action='store_true')
@@ -75,8 +72,6 @@ def main():
     
     if not moitt.profile:
         raise KeyError("Missing AWS_PROFILE environment variable")
-    if not moitt.pullsec:
-        raise KeyError("Missing PULL_SEC environment variable")
 
     ocp = OCP(profile=moitt.profile, assets=moitt.assets, version=moitt.version)
     os.environ['KUBECONFIG'] = moitt.assets + '/auth/kubeconfig'
@@ -99,30 +94,13 @@ def main():
         elif moitt.uninstall:
             ocp.uninstall()
     
-    if moitt.component == 'registry-puller':
-        puller = Puller(secret_file=moitt.pullsec)
-
-        if moitt.bot:
-            ocp.login_bot()
-        else:
-            # Read kubeadmin password
-            with open(moitt.assets + '/auth/kubeadmin-password') as f:
-                pw = f.read()
-            ocp.login('kubeadmin', pw)
-
-        if moitt.install:
-            puller.build()
-            puller.execute()
-
-        ocp.logout()
-    
     if moitt.component == 'istio':
         operator = Operator(maistra_branch="maistra-"+moitt.release, release=moitt.release)
 
         nslist = ['bookinfo', 'foo', 'bar', 'legacy']
         smmr = os.getcwd() + '/testdata/member-roll.yaml'
         sample = os.getcwd() + '/testdata/bookinfo.yaml'
-        cp = ControlPlane("basic-install", "istio-system", "bookinfo", nslist, smmr, sample)
+        cp = ControlPlane("basic", "istio-system", "bookinfo", nslist, smmr, sample)
         if moitt.install:
             # deploy operators
             if moitt.bot:
@@ -137,7 +115,6 @@ def main():
                 operator.update_quay_token()
                 operator.apply_catalog_source()
 
-            #operator.deploy_es()
             operator.deploy_jaeger()
             operator.deploy_kiali()
             operator.deploy_istio()
