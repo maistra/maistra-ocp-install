@@ -1,10 +1,71 @@
 #!/bin/bash
 
-QUAY_TOKEN_SECRET_FILE=""
+SERVER=""
+USER=""
+PASS=""
+AUTHFILE=""
 QUAY_TOKEN=""
 
+function login() {
+  oc login -u $USER -p $PASS \
+    --server=${SERVER} \
+    --insecure-skip-tls-verify=true
+}
+
+function deploy_iscp() {
+  echo "Add icsp and pull secret"
+  oc set data secret/pull-secret -n openshift-config --from-file=.dockerconfigjson=${AUTHFILE}
+  oc apply -f - <<EOF
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  name: brew-registry
+spec:
+  repositoryDigestMirrors:
+  - mirrors:
+    - brew.registry.redhat.io
+    source: registry.redhat.io
+  - mirrors:
+    - brew.registry.redhat.io
+    source: registry.stage.redhat.io
+  - mirrors:
+    - brew.registry.redhat.io
+    source: registry-proxy.engineering.redhat.com
+EOF
+  sleep 120
+}
+
+function deploy_catalog_source() {
+  oc project openshift-marketplace
+  oc apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: quay-operators-secret
+  namespace: openshift-marketplace
+type: Opaque
+stringData:
+  token: "basic ${QUAY_TOKEN}"
+EOF
+  sleep 5
+  oc secrets link --for=pull default quay-operators-secret -n openshift-marketplace
+  sleep 30
+
+  oc apply -f - <<EOF
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: maistra-manifests
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  image: "quay.io/maistra/servicemesh-olm-iib:2.0.2-qe"
+EOF
+  sleep 180
+}
+
 function deploy_jaeger() {
-    oc apply -f - <<EOF
+  oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -17,51 +78,10 @@ spec:
   source: redhat-operators
   sourceNamespace: openshift-marketplace
 EOF
-
-}
-
-function deploy_catalog_source() {
-    oc apply -f - <<EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  name: quay-operators-secret
-  namespace: openshift-marketplace
-type: Opaque
-stringData:
-  token: "basic ${QUAY_TOKEN}"
-EOF
-
-    sleep 5
-    oc secrets link --for=pull default quay-operators-secret -n openshift-marketplace
-
-    oc apply -f - <<EOF
-apiVersion: operators.coreos.com/v1alpha1
-kind: CatalogSource
-metadata:
-  name: maistra-manifests
-  namespace: openshift-marketplace
-spec:
-  sourceType: grpc
-  image: "quay.io/maistra/servicemesh-olm-cs:latest-2.0-qe"
-EOF
-
-    oc apply -f - <<EOF
-apiVersion: operators.coreos.com/v1alpha1
-kind: CatalogSource
-metadata:
-  name: kiali-manifests
-  namespace: openshift-marketplace
-spec:
-  sourceType: grpc
-  image: "quay.io/maistra/kiali-olm-cs:1.12.13"
-EOF
-
-    sleep 30
 }
 
 function deploy_ossm_operator() {
-    oc apply -f - <<EOF
+  oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -71,11 +91,11 @@ spec:
   channel: stable
   installPlanApproval: Automatic
   name: kiali-ossm 
-  source: kiali-manifests
+  source: redhat-operators
   sourceNamespace: openshift-marketplace
 EOF
 
-    oc apply -f - <<EOF
+  oc apply -f - <<EOF
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
@@ -89,12 +109,12 @@ spec:
   sourceNamespace: openshift-marketplace
 EOF
 
-    sleep 180
+  sleep 180
 }
 
 function create_smcp() {
-    oc new-project istio-system
-    oc apply -f - <<EOF
+  oc new-project istio-system
+  oc apply -f - <<EOF
 apiVersion: maistra.io/v1
 kind: ServiceMeshControlPlane
 metadata:
@@ -127,16 +147,18 @@ spec:
         template: all-in-one
 EOF
 
-    echo "Waiting installation complete..."
-    sleep 40
-
+  echo "Waiting installation complete..."
+  sleep 60
 }
 
 function main() {
-    deploy_jaeger
-    deploy_catalog_source
-    deploy_ossm_operator
-    create_smcp
+  login
+  #deploy_iscp
+  deploy_catalog_source
+  deploy_jaeger
+  deploy_catalog_source
+  deploy_ossm_operator
+  create_smcp
 }
 
 main
