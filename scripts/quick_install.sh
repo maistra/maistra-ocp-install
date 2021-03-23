@@ -115,36 +115,31 @@ EOF
 function create_smcp() {
   oc new-project istio-system
   oc apply -f - <<EOF
-apiVersion: maistra.io/v1
+apiVersion: maistra.io/v2
 kind: ServiceMeshControlPlane
 metadata:
-  name: basic
   namespace: istio-system
+  name: basic
 spec:
-  version: v2.0
-  istio:
-    gateways:
-      istio-egressgateway:
-        autoscaleEnabled: false
-      istio-ingressgateway:
-        autoscaleEnabled: false
-        ior_enabled: false
-    mixer:
-      policy:
-        autoscaleEnabled: false
-      telemetry:
-        autoscaleEnabled: false
-    pilot:
-      autoscaleEnabled: false
-      traceSampling: 100
-    kiali:
-      enabled: true
+  tracing:
+    sampling: 10000
+    type: Jaeger
+  policy:
+    type: Istiod
+  addons:
     grafana:
       enabled: true
-    tracing:
+    jaeger:
+      install:
+        storage:
+          type: Memory
+    kiali:
       enabled: true
-      jaeger:
-        template: all-in-one
+    prometheus:
+      enabled: true
+  version: v2.0
+  telemetry:
+    type: Istiod
 EOF
 
   echo "Waiting installation complete..."
