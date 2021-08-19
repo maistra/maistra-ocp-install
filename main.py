@@ -35,6 +35,7 @@ class Moitt(object):
         self.version = None
         self.quay = False
         self.release = None
+        self.nightly = False
         
     def envParse(self):
         if 'AWS_PROFILE' in os.environ:
@@ -54,6 +55,7 @@ class Moitt(object):
         parser.add_argument('-q', '--quay', help='install istio operator from quay.io', action='store_true')
         parser.add_argument('-r', '--release', type=str, default='stable', help='OLM release channel')
         parser.add_argument('-b', '--bot', help='login cluster created by cluster-bot', action='store_true')
+        parser.add_argument('-n', '--nightly', help='create nightly cluster for daily build', action='store_true')
         args = parser.parse_args()
         self.install = args.install
         self.uninstall = args.uninstall
@@ -63,6 +65,7 @@ class Moitt(object):
         self.quay = args.quay
         self.release = args.release
         self.bot = args.bot
+        self.nightly = args.nightly
       
 
 def main():
@@ -114,6 +117,9 @@ def main():
             if moitt.quay:
                 operator.update_quay_token()
                 operator.apply_catalog_source()
+            if moitt.nightly:
+                ocp.logout()
+                return
 
             operator.deploy_jaeger()
             operator.deploy_kiali()
@@ -156,9 +162,9 @@ def main():
 
             operator.uninstall()
 
-            if moitt.quay:
+            ##if moitt.quay:
                 #operator.uninstall_operator_source()
-                operator.uninstall_catalog_source()
+            ##    operator.uninstall_catalog_source()
 
             ocp.logout()
 

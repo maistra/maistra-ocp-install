@@ -10,7 +10,3 @@ spec:
   - mirrors:
     - brew.registry.redhat.io
     source: registry.stage.redhat.io
-  - mirrors:
-    - brew.registry.redhat.io
-    source: registry-proxy.engineering.redhat.com
-
