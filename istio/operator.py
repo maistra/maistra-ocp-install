@@ -85,10 +85,6 @@ class Operator(object):
         sp.run(['oc', 'secrets', 'link', '--for=pull', 'default', 'quay-operators-secret', '-n', 'openshift-marketplace'])
         sp.run(['sleep', '30'])
         sp.run(['oc', 'apply', '-f', 'olm/{:s}/maistra_catalog_source.yaml'.format(self.release)])
-        ##sp.run(['oc', 'apply', '-f', 'olm/{:s}/jaeger_catalog_source.yaml'.format(self.release)])
-        if self.release == "maistra-2.0":
-            sp.run(['oc', 'apply', '-f', 'olm/{:s}/kiali_catalog_source.yaml'.format(self.release)])
-
         sp.run(['sleep', '180'])
 
     def apply_operator_source(self):
