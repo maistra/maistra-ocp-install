@@ -66,26 +66,22 @@ kind: ServiceMeshControlPlane
 metadata:
   name: basic
 spec:
-  version: v2.1
   tracing:
-    type: Jaeger
-    sampling: 10000
-  policy:
-    type: Istiod
+    # change to Jaeger to enable tracing
+    type: None
   addons:
-    grafana:
-      enabled: true
     jaeger:
-      install:
-        storage:
-          type: Memory
+      name: jaeger
+      install: {}
+    grafana:
+      enabled: false
+      install: {}
     kiali:
-      enabled: true
+      name: kiali
+      enabled: false
+      install: {}
     prometheus:
-      enabled: true
-  
-  telemetry:
-    type: Istiod
+      enabled: false
 EOF
 
   oc apply -n istio-system -f - <<EOF
@@ -100,7 +96,8 @@ spec:
 EOF
 
   echo "Waiting installation complete..."
-  oc wait --for condition=Ready -n istio-system smmr/default --timeout 300s  
+  oc wait --for condition=Ready -n istio-system smmr/default --timeout 300s
+  oc get -n istio-system smcp/basic -o wide
 }
 
 function main() {
